@@ -1,48 +1,4 @@
---			AUXILIARY			--
-
---splits string on pattern occurances into output as table
-function split(input, pattern)
-	local output = {}
-	local searchPattern = "(.-)"..pattern
-	local lastEnd = 1
-	local s, e, cap = input:find(searchPattern, 1)
-	while s do
-		if s ~= 1 or cap ~= "" then
-			table.insert(output,cap)
-		end
-		lastEnd = e+1
-		s, e, cap = input:find(searchPattern, lastEnd)
-	end
-	if lastEnd <= #input then
-		cap = input:sub(lastEnd)
-		table.insert(output, cap)
-	end
-	return output
-end
-
---reads file's content, returns string
-function fileRead(filepath)
-	file = io.open(filepath,"r")
-	if file then--successfully loaded
-		fileContent = file:read("*all")
-		file:close()
-		output = split(fileContent,'\n')
-	else        --loading failed
-		io.write('File "'..filepath..'" does not exist.\n')
-	end
-	return output
-end
-
---saves inputs's content to file at filepath
---input is a table
-function fileSave(filepath,input)
-	file = io.open(filepath,"w")
-	for lineNumer=1,# input do
-		file:write(input[lineNumer]..'\n')
-	end
-end
-
---			CONTENT			--
+--			MANIPULATION OF CONTENT			--
 
 --writes string in given formatted fashion
 function contentWrite(input, flagLineEnumeration)
@@ -57,7 +13,48 @@ function contentWrite(input, flagLineEnumeration)
 	end
 end
 
---			CHARACTERS IN LINES			--
+--			MANIPULATION OF LINES IN CONTENT			--
+
+--replaces a line at position in content with input
+function lineReplace(content, input, position)
+	input = input or ""
+	if(position > 0 and position <= #content) then
+		table.remove(content,position)
+		table.insert(content,position,input)
+	end
+end
+--adds input before position in content
+function lineAddLinePre(content, input, position)
+	input = input or ""
+	table.insert(content,position,input)
+end
+--adds input after position in content
+function lineAddLinePost(content, input, position)
+	input = input or ""
+	table.insert(content,position+1,input)
+end
+--inserts a line(input) at the end of content
+--input is empty line by default
+function linePushBack(content, input)
+	input = input or ""
+	table.insert(content,input)
+end
+--inserts a line (input) at the beginning of content
+--input is empty line by default
+function linePushFront(content, input)
+	input = input or ""
+	table.insert(content,1,input)
+end
+--removes first line in content
+function linePopFront(content)
+	table.remove(content,1)
+end
+--removes last line in content
+function linePopBack(content, input)
+	table.remove(content,#content)
+end
+
+--			MANIPULATION OF CHARACTERS IN LINES			--
 
 --replaces character at position in input
 --if position invalid, return unchanged
@@ -100,46 +97,48 @@ function charPopBack(input)
 	return table.concat{input:sub(1,position-1)}
 end
 
---			LINES IN CONTENT			--
+--			AUXILIARY			--
 
---replaces a line at position in content with input
-function lineReplace(content, input, position)
-	input = input or ""
-	if(position > 0 and position <= #content) then
-		table.remove(content,position)
-		table.insert(content,position,input)
+--splits string on pattern occurances into output as table
+function split(input, pattern)
+	local output = {}
+	local searchPattern = "(.-)"..pattern
+	local lastEnd = 1
+	local s, e, cap = input:find(searchPattern, 1)
+	while s do
+		if s ~= 1 or cap ~= "" then
+			table.insert(output,cap)
+		end
+		lastEnd = e+1
+		s, e, cap = input:find(searchPattern, lastEnd)
+	end
+	if lastEnd <= #input then
+		cap = input:sub(lastEnd)
+		table.insert(output, cap)
+	end
+	return output
+end
+--reads file's content, returns string
+function fileRead(filepath)
+	file = io.open(filepath,"r")
+	if file then--successfully loaded
+		fileContent = file:read("*all")
+		file:close()
+		output = split(fileContent,'\n')
+	else        --loading failed
+		io.write('File "'..filepath..'" does not exist.\n')
+	end
+	return output
+end
+--saves inputs's content to file at filepath
+--input is a table
+function fileSave(filepath,input)
+	file = io.open(filepath,"w")
+	for lineNumer=1,# input do
+		file:write(input[lineNumer]..'\n')
 	end
 end
---adds input before position in content
-function lineAddLinePre(content, input, position)
-	input = input or ""
-	table.insert(content,position,input)
-end
---adds input after position in content
-function lineAddLinePost(content, input, position)
-	input = input or ""
-	table.insert(content,position+1,input)
-end
---inserts a line(input) at the end of content
---input is empty line by default
-function linePushBack(content, input)
-	input = input or ""
-	table.insert(content,input)
-end
---inserts a line (input) at the beginning of content
---input is empty line by default
-function linePushFront(content, input)
-	input = input or ""
-	table.insert(content,1,input)
-end
---removes first line in content
-function linePopFront(content)
-	table.remove(content,1)
-end
---removes last line in content
-function linePopBack(content, input)
-	table.remove(content,#content)
-end
+
 
 --			Examplatory Usage			--
 
